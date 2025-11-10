@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CalPal - Exercise Tracker</title>
+  <link rel="stylesheet" href="css/calpal.css">
+</head>
+<body>
+  <header>
+    <div class="header-container">
+      <div class="logo">
+        <h1>CALPAL</h1>
+        <p>Your everyday health companion</p>
+      </div>
+      <nav>
+        <ul>
+          <li><a href="index.html">Dashboard</a></li>
+          <li><a href="calorie-calculator.html">Calculator</a></li>
+          <li><a href="food-diary.html">Food Diary</a></li>
+          <li><a href="exercise-tracker.html" class="active">Exercise</a></li>
+          <li><a href="weekly-schedule.html">Schedule</a></li>
+          <li><a href="progress.html">Progress</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <div class="page-title">
+    <h2>Exercise Tracker</h2>
+    <p>Log your workouts and track calories burned</p>
+  </div>
+
+  <div class="main">
+    <div class="card">
+      <h3>Add Workout</h3>
+      <div id="message"></div>
+
+      <div class="form-group">
+        <label>
+          <input type="radio" name="workout-type" value="preset" checked> Use Preset Exercise
+        </label>
+        <label style="margin-left: 1rem;">
+          <input type="radio" name="workout-type" value="custom"> Add Custom Workout
+        </label>
+      </div>
+
+      <div id="preset-section">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="exercise">Exercise</label>
+            <select id="exercise">
+              <option value="">-- Select an exercise --</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="duration">Duration (minutes)</label>
+            <input type="number" id="duration" placeholder="e.g., 30">
+          </div>
+        </div>
+      </div>
+
+      <div id="custom-section" style="display: none;">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="custom-name">Workout Name</label>
+            <input type="text" id="custom-name" placeholder="e.g., Bench Press">
+          </div>
+          <div class="form-group">
+            <label for="custom-sets">Sets</label>
+            <input type="number" id="custom-sets" placeholder="e.g., 3">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="custom-reps">Reps</label>
+            <input type="number" id="custom-reps" placeholder="e.g., 10">
+          </div>
+          <div class="form-group">
+            <label for="custom-calories">Calories Burned (optional)</label>
+            <input type="number" id="custom-calories" placeholder="e.g., 150">
+          </div>
+        </div>
+      </div>
+
+      <div class="btn-group">
+        <button id="add-workout-btn">Add Workout</button>
+        <button id="clear-all-btn" class="btn-secondary">Clear All</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Today's Workouts</h3>
+      <div id="totals" class="totals">No workouts logged yet.</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Exercise</th>
+            <th>Intensity</th>
+            <th>Minutes</th>
+            <th>Calories Burned</th>
+          </tr>
+        </thead>
+        <tbody id="workouts-tbody">
+          <tr>
+            <td colspan="4" style="text-align: center; color: #a0a0a0;">No workouts logged yet.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/exerciseTracker.js"></script>
+</body>
+</html>

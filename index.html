@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CalPal - Dashboard</title>
+  <link rel="stylesheet" href="css/calpal.css">
+</head>
+<body>
+  <header>
+    <div class="header-container">
+      <div class="logo">
+        <h1>CALPAL</h1>
+        <p>Your everyday health companion</p>
+      </div>
+      <nav>
+        <ul>
+          <li><a href="index.html" class="active">Dashboard</a></li>
+          <li><a href="calorie-calculator.html">Calculator</a></li>
+          <li><a href="food-diary.html">Food Diary</a></li>
+          <li><a href="exercise-tracker.html">Exercise</a></li>
+          <li><a href="weekly-schedule.html">Schedule</a></li>
+          <li><a href="progress.html">Progress</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <div class="page-title">
+    <h2>Dashboard</h2>
+    <p>Your daily health overview at a glance</p>
+  </div>
+
+  <div class="main">
+    <div class="card-grid">
+      <!-- Calories Overview Card -->
+      <div class="card">
+        <h3>Calories Overview</h3>
+        <div class="metric">
+          <div id="metric-calories" class="metric-value">2050 in / 480 out</div>
+          <p id="metric-calories-sub" class="metric-sub">About 150 kcal under your target.</p>
+        </div>
+        <div class="btn-group">
+          <button onclick="window.location.href='food-diary.html'">Log a meal</button>
+          <button onclick="window.location.href='exercise-tracker.html'" class="btn-secondary">Log a workout</button>
+        </div>
+      </div>
+
+      <!-- Active Goal Card -->
+      <div class="card">
+        <h3>Active Goal</h3>
+        <p style="color: #a0a0a0; margin-bottom: 1rem;">Lose 5 lbs in 6 weeks</p>
+        <div class="graph" id="weight-mini-graph">
+          <div class="bar" style="height: 60%;"></div>
+          <div class="bar" style="height: 65%;"></div>
+          <div class="bar" style="height: 58%;"></div>
+          <div class="bar" style="height: 70%;"></div>
+          <div class="bar" style="height: 75%;"></div>
+          <div class="bar" style="height: 80%;"></div>
+          <div class="bar" style="height: 85%;"></div>
+        </div>
+        <p id="goal-progress-text" style="color: #4ade80; text-align: center; margin-top: 0.5rem;">
+          You're down 2.0 lbs from the start of this sample week.
+        </p>
+      </div>
+    </div>
+
+    <!-- Fit Points Card -->
+    <div class="card">
+      <h3>Fit Points</h3>
+      <div class="metric">
+        <div id="fitpoints-value" class="metric-value">65 pts</div>
+        <p id="fitpoints-sub" class="metric-sub">Keep going! Reach 100 points to unlock your next badge.</p>
+      </div>
+      <ul style="list-style: none; color: #a0a0a0; margin-top: 1rem;">
+        <li>• Log a meal: +5 pts</li>
+        <li>• Complete a workout: +10 pts</li>
+        <li>• Plan your week: +15 pts</li>
+        <li>• Hit your calorie target: +20 pts</li>
+      </ul>
+    </div>
+
+    <!-- Quick Actions Card -->
+    <div class="card">
+      <h3>Quick Actions</h3>
+      <div class="btn-group">
+        <button onclick="window.location.href='calorie-calculator.html'">Recalculate Target</button>
+        <button onclick="window.location.href='weekly-schedule.html'" class="btn-secondary">Plan Your Week</button>
+        <button onclick="window.location.href='progress.html'" class="btn-secondary">Review Progress</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/progress.js"></script>
+</body>
+</html>

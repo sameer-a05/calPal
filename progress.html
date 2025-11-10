@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CalPal - Progress</title>
+  <link rel="stylesheet" href="css/calpal.css">
+</head>
+<body>
+  <header>
+    <div class="header-container">
+      <div class="logo">
+        <h1>CALPAL</h1>
+        <p>Your everyday health companion</p>
+      </div>
+      <nav>
+        <ul>
+          <li><a href="index.html">Dashboard</a></li>
+          <li><a href="calorie-calculator.html">Calculator</a></li>
+          <li><a href="food-diary.html">Food Diary</a></li>
+          <li><a href="exercise-tracker.html">Exercise</a></li>
+          <li><a href="weekly-schedule.html">Schedule</a></li>
+          <li><a href="progress.html" class="active">Progress</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <div class="page-title">
+    <h2>Progress Overview</h2>
+    <p>Review your health journey and achievements</p>
+  </div>
+
+  <div class="main">
+    <div class="card-grid">
+      <!-- Weight Progress Card -->
+      <div class="card">
+        <h3>Weight Progress</h3>
+        <div class="metric">
+          <div id="weight-current" class="metric-value">170 lbs</div>
+          <p id="weight-change" class="metric-sub">Down 2.0 lbs this week</p>
+        </div>
+        <div id="weight-graph" class="graph"></div>
+      </div>
+
+      <!-- Calorie Balance Card -->
+      <div class="card">
+        <h3>Calorie Balance</h3>
+        <div class="metric">
+          <div id="calories-balance" class="metric-value">+1570</div>
+          <p id="calories-balance-detail" class="metric-sub">2050 in | 480 out | 2200 target</p>
+        </div>
+        <div id="calories-graph" class="graph"></div>
+      </div>
+    </div>
+
+    <!-- Weekly Summary Card -->
+    <div class="card">
+      <h3>Weekly Summary</h3>
+      <div class="result-grid">
+        <div class="result-item">
+          <div class="result-value">7</div>
+          <div class="result-label">Days Tracked</div>
+        </div>
+        <div class="result-item">
+          <div class="result-value">5</div>
+          <div class="result-label">Workouts Logged</div>
+        </div>
+        <div class="result-item">
+          <div class="result-value">85%</div>
+          <div class="result-label">Goal Adherence</div>
+        </div>
+        <div class="result-item">
+          <div class="result-value">65</div>
+          <div class="result-label">Fit Points Earned</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/progress.js"></script>
+</body>
+</html>
