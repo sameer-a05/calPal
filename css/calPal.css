@@ -370,6 +370,83 @@
     color: #4ade80;
   }
   
+  /* ============================= */
+  /* INDEX.HTML SPECIFIC STYLES   */
+  /* ============================= */
+  
+  /* Dashboard - Centered Button Group for Calories Overview Card */
+  .btn-group-center {
+    justify-content: center;
+  }
+  
+  /* Dashboard - Goal Points Progress Container */
+  .progress-container {
+    background: #252525;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-top: 1rem;
+    text-align: center;
+  }
+  
+  /* Dashboard - Progress Container Title */
+  .progress-title {
+    color: #4ade80;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+  
+  /* Dashboard - Current Goal Title Display */
+  .current-goal-title {
+    color: #e0e0e0;
+    font-size: 0.95rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  /* Dashboard - Progress Bar Wrapper/Background */
+  .progress-bar-wrapper {
+    background: #1a1a1a;
+    height: 24px;
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+  }
+  
+  /* Dashboard - Progress Bar Fill Element */
+  .progress-bar-fill {
+    background: #4ade80;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #1a1a1a;
+    font-size: 0.75rem;
+    font-weight: 600;
+    min-width: 30px;
+    transition: width 0.3s ease;
+  }
+
+  /* Centered percentage inside the filled portion */
+  .progress-fill-text {
+    color: #1a1a1a; /* black/dark to match request */
+    font-size: 0.9rem;
+    font-weight: 700;
+    pointer-events: none;
+    white-space: nowrap;
+    line-height: 1;
+  }
+
+  
+  /* Dashboard - Progress Container Supporting Text */
+  .progress-text {
+    color: #a0a0a0;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+  }
+  
   /* Responsive */
   @media (max-width: 768px) {
     .header-container {
