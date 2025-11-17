@@ -1,7 +1,7 @@
 // CalPal - Exercise Tracker JavaScript
 
-// Store workouts for current session
-let workouts = [];
+// Load workouts from localStorage or use empty array
+let workouts = JSON.parse(localStorage.getItem('dailyWorkouts')) || [];
 
 // Show message
 function showMessage(text, isError = false) {
@@ -95,6 +95,9 @@ document.addEventListener('DOMContentLoaded', function() {
       calories: caloriesBurned
     });
     
+    // Save to localStorage
+    localStorage.setItem('dailyWorkouts', JSON.stringify(workouts));
+    
     // Clear inputs
     document.getElementById('exercise').value = '';
     document.getElementById('duration').value = '';
@@ -112,6 +115,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if (confirm('Are you sure you want to clear all workouts?')) {
       workouts = [];
+      localStorage.setItem('dailyWorkouts', JSON.stringify(workouts));
       renderTable();
       showMessage('All workouts cleared.');
     }

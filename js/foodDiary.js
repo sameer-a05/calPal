@@ -1,7 +1,7 @@
 // CalPal - Food Diary JavaScript
 
-// Store meals for current session
-let meals = [];
+// Load meals from localStorage or use empty array
+let meals = JSON.parse(localStorage.getItem('dailyMeals')) || [];
 
 // Show message
 function showMessage(text, isError = false) {
@@ -59,6 +59,7 @@ function renderTable() {
     btn.addEventListener('click', function() {
       const index = parseInt(this.getAttribute('data-index'));
       meals.splice(index, 1);
+      localStorage.setItem('dailyMeals', JSON.stringify(meals));
       renderTable();
       showMessage('Meal removed.');
     });
@@ -129,6 +130,9 @@ document.addEventListener('DOMContentLoaded', function() {
       fat: fat
     });
     
+    // Save to localStorage
+    localStorage.setItem('dailyMeals', JSON.stringify(meals));
+    
     // Clear inputs
     document.getElementById('preset').value = '';
     document.getElementById('food-name').value = '';
@@ -150,6 +154,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if (confirm('Are you sure you want to clear all meals?')) {
       meals = [];
+      localStorage.setItem('dailyMeals', JSON.stringify(meals));
       renderTable();
       showMessage('All meals cleared.');
     }

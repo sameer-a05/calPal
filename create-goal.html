@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Goal - CalPal</title>
+  <link rel="stylesheet" href="css/calpal.css">
+  <style>
+    .create-goal-container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+
+    .create-goal-card {
+      background: #2d2d2d;
+      border: 1px solid #3a3a3a;
+      border-radius: 12px;
+      padding: 2rem;
+    }
+
+    .create-goal-card h2 {
+      color: #4ade80;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+      display: block;
+      color: #a0a0a0;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 0.75rem;
+      background: #1a1a1a;
+      border: 1px solid #3a3a3a;
+      border-radius: 8px;
+      color: #e0e0e0;
+      font-size: 1rem;
+      font-family: inherit;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #4ade80;
+      box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.1);
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+      justify-content: center;
+    }
+
+    .form-actions button {
+      padding: 0.75rem 2rem;
+      font-size: 1rem;
+      cursor: pointer;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .btn-submit {
+      background: #4ade80;
+      color: #1a1a1a;
+      flex: 1;
+      max-width: 200px;
+    }
+
+    .btn-submit:hover {
+      background: #3bc970;
+      transform: translateY(-2px);
+    }
+
+    .btn-cancel {
+      background: #3a3a3a;
+      color: #e0e0e0;
+      flex: 1;
+      max-width: 200px;
+    }
+
+    .btn-cancel:hover {
+      background: #4a4a4a;
+    }
+
+    .error-message {
+      color: #ef4444;
+      font-size: 0.9rem;
+      margin-top: 0.3rem;
+      display: none;
+    }
+
+    .success-message {
+      background: #2a3a2a;
+      border-left: 4px solid #4ade80;
+      color: #4ade80;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-container">
+      <div class="logo">
+        <img src="images/CalPal Logo.png" alt="CalPal Logo">
+        <div>
+          <h1>CALPAL</h1>
+          <p>Your everyday health companion</p>
+        </div>
+      </div>
+      <nav>
+        <ul>
+          <li><a href="index.html">Dashboard</a></li>
+          <li><a href="calorie-calculator.html">Calculator</a></li>
+          <li><a href="food-diary.html">Food Diary</a></li>
+          <li><a href="exercise-tracker.html">Exercise</a></li>
+          <li><a href="weekly-schedule.html">Schedule</a></li>
+          <li><a href="progress.html">Progress</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <div class="page-title">
+    <h2>Create New Goal</h2>
+    <p>Set a new goal to track and earn reward points</p>
+  </div>
+
+  <div class="create-goal-container">
+    <div class="create-goal-card">
+      <div id="success-message" class="success-message">
+        Goal created successfully! Redirecting...
+      </div>
+
+      <form id="goal-form">
+        <div class="form-group">
+          <label for="goal-title">Goal Title *</label>
+          <input type="text" id="goal-title" name="goal-title" placeholder="e.g., Lose 5 lbs, Run a 5K, Build muscle" required>
+          <div class="error-message" id="title-error">Goal title is required</div>
+        </div>
+
+        <div class="form-group">
+          <label for="goal-type">Goal Type *</label>
+          <select id="goal-type" name="goal-type" required>
+            <option value="Exercise">Exercise</option>
+            <option value="Weight Loss">Weight Loss</option>
+            <option value="Custom">Custom</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="goal-description">Description</label>
+          <textarea id="goal-description" name="goal-description" placeholder="Describe your goal in detail (optional)"></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="start-date">Start By</label>
+            <input type="date" id="start-date" name="start-date">
+          </div>
+          <div class="form-group">
+            <label for="end-date">Complete By</label>
+            <input type="date" id="end-date" name="end-date">
+          </div>
+        </div>
+
+        <div id="type-specific" class="">
+          <!-- Exercise / Weight Loss fields -->
+          <div class="form-group" id="target-group">
+            <label for="goal-target">Target</label>
+            <input type="number" id="goal-target" name="goal-target" placeholder="Number (workouts or lbs)" min="1">
+            <div class="error-message" id="target-error">Please enter a valid target (number > 0)</div>
+          </div>
+
+          <!-- For custom, allow initial progress percentage -->
+          <div class="form-group" id="custom-progress-group" style="display:none;">
+            <label for="goal-progress">Initial Progress (%)</label>
+            <input type="number" id="goal-progress" name="goal-progress" value="0" min="0" max="100">
+            <div class="error-message" id="progress-error">Progress must be between 0 and 100</div>
+          </div>
+        </div>
+
+        <!-- Reward is assigned automatically based on goal type; removed manual input -->
+
+        <div class="form-actions">
+          <button type="button" class="btn-cancel" onclick="cancelGoal()">Cancel</button>
+          <button type="submit" class="btn-submit">Create Goal</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/create-goal.js"></script>
+</body>
+</html>
