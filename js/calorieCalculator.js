@@ -41,19 +41,60 @@ function calculateBMR(sex, weightLbs, heightInches, age) {
     return adjustments[goal] || 0;
   }
   
-  // Clear results
-  function clearResults() {
-    document.getElementById('results-section').style.display = 'none';
-    document.getElementById('bmr-value').textContent = '0';
-    document.getElementById('target-value').textContent = '0';
-    document.getElementById('protein-value').textContent = '0';
-    document.getElementById('carbs-value').textContent = '0';
-    document.getElementById('fat-value').textContent = '0';
-    document.getElementById('results-message').textContent = '';
-    document.getElementById('error-message').innerHTML = '';
-  }
+// Clear results
+function clearResults() {
+  document.getElementById('results-section').style.display = 'none';
+  document.getElementById('bmr-value').textContent = '0';
+  document.getElementById('target-value').textContent = '0';
+  document.getElementById('protein-value').textContent = '0';
+  document.getElementById('carbs-value').textContent = '0';
+  document.getElementById('fat-value').textContent = '0';
+  document.getElementById('results-message').textContent = '';
+  document.getElementById('error-message').innerHTML = '';
+}
+
+// Load saved results from localStorage
+function loadSavedResults() {
+  const hasGoal = localStorage.getItem('calorieGoalSet') === 'true';
   
-  // Show error message
+  if (hasGoal) {
+    const targetCalories = localStorage.getItem('targetCalories');
+    const bmr = localStorage.getItem('bmr');
+    const protein = localStorage.getItem('proteinGrams');
+    const carbs = localStorage.getItem('carbsGrams');
+    const fat = localStorage.getItem('fatGrams');
+    const message = localStorage.getItem('goalMessage') || 'Your saved calorie goal.';
+    
+    if (targetCalories && bmr) {
+      document.getElementById('bmr-value').textContent = bmr;
+      document.getElementById('target-value').textContent = targetCalories;
+      document.getElementById('protein-value').textContent = protein || '0';
+      document.getElementById('carbs-value').textContent = carbs || '0';
+      document.getElementById('fat-value').textContent = fat || '0';
+      document.getElementById('results-message').textContent = message;
+      document.getElementById('results-section').style.display = 'block';
+    }
+  }
+}
+
+// Load saved input values from localStorage
+function loadSavedInputs() {
+  const sex = localStorage.getItem('calcSex');
+  const age = localStorage.getItem('calcAge');
+  const heightFt = localStorage.getItem('calcHeightFt');
+  const heightIn = localStorage.getItem('calcHeightIn');
+  const weight = localStorage.getItem('calcWeight');
+  const activity = localStorage.getItem('calcActivity');
+  const goal = localStorage.getItem('calcGoal');
+  
+  if (sex) document.getElementById('sex').value = sex;
+  if (age) document.getElementById('age').value = age;
+  if (heightFt) document.getElementById('height-ft').value = heightFt;
+  if (heightIn) document.getElementById('height-in').value = heightIn;
+  if (weight) document.getElementById('weight').value = weight;
+  if (activity) document.getElementById('activity').value = activity;
+  if (goal) document.getElementById('goal').value = goal;
+}  // Show error message
   function showError(message) {
     const errorDiv = document.getElementById('error-message');
     errorDiv.innerHTML = `<div class="message error">${message}</div>`;
@@ -133,11 +174,29 @@ function calculateBMR(sex, weightLbs, heightInches, age) {
       document.getElementById('results-message').textContent = message;
       document.getElementById('results-section').style.display = 'block';
       
+      // Save to localStorage for dashboard
+      localStorage.setItem('targetCalories', targetCalories);
+      localStorage.setItem('bmr', bmr);
+      localStorage.setItem('proteinGrams', proteinGrams);
+      localStorage.setItem('carbsGrams', carbsGrams);
+      localStorage.setItem('fatGrams', fatGrams);
+      localStorage.setItem('goalMessage', message);
+      localStorage.setItem('calorieGoalSet', 'true');
+      
+      // Save input values for autofill
+      localStorage.setItem('calcSex', sex);
+      localStorage.setItem('calcAge', age);
+      localStorage.setItem('calcHeightFt', heightFt);
+      localStorage.setItem('calcHeightIn', heightIn);
+      localStorage.setItem('calcWeight', weight);
+      localStorage.setItem('calcActivity', activity);
+      localStorage.setItem('calcGoal', goal);
+      
       // Scroll to results
       document.getElementById('results-section').scrollIntoView({ behavior: 'smooth' });
     });
     
-    // Clear button
+    // Clear button - only clears input fields
     clearBtn.addEventListener('click', function() {
       document.getElementById('sex').value = 'male';
       document.getElementById('age').value = '';
@@ -146,6 +205,44 @@ function calculateBMR(sex, weightLbs, heightInches, age) {
       document.getElementById('weight').value = '';
       document.getElementById('activity').value = '3';
       document.getElementById('goal').value = '2';
-      clearResults();
+      
+      // Clear saved input values from localStorage
+      localStorage.removeItem('calcSex');
+      localStorage.removeItem('calcAge');
+      localStorage.removeItem('calcHeightFt');
+      localStorage.removeItem('calcHeightIn');
+      localStorage.removeItem('calcWeight');
+      localStorage.removeItem('calcActivity');
+      localStorage.removeItem('calcGoal');
     });
+    
+    // Clear Results button
+    const clearResultsBtn = document.getElementById('clear-results-btn');
+    if (clearResultsBtn) {
+      clearResultsBtn.addEventListener('click', function() {
+        if (confirm('Are you sure you want to clear your calorie goal? This will also remove it from the Dashboard.')) {
+          clearResults();
+          
+          // Clear from localStorage
+          localStorage.removeItem('targetCalories');
+          localStorage.removeItem('bmr');
+          localStorage.removeItem('proteinGrams');
+          localStorage.removeItem('carbsGrams');
+          localStorage.removeItem('fatGrams');
+          localStorage.removeItem('goalMessage');
+          localStorage.removeItem('calorieGoalSet');
+          localStorage.removeItem('calcSex');
+          localStorage.removeItem('calcAge');
+          localStorage.removeItem('calcHeightFt');
+          localStorage.removeItem('calcHeightIn');
+          localStorage.removeItem('calcWeight');
+          localStorage.removeItem('calcActivity');
+          localStorage.removeItem('calcGoal');
+        }
+      });
+    }
+    
+    // Load saved results and inputs on page load
+    loadSavedInputs();
+    loadSavedResults();
   });

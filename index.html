@@ -10,8 +10,11 @@
   <header>
     <div class="header-container">
       <div class="logo">
-        <h1>CALPAL</h1>
-        <p>Your everyday health companion</p>
+        <img src="images/CalPal Logo.png" alt="CalPal Logo">
+        <div>
+          <h1>CALPAL</h1>
+          <p>Your everyday health companion</p>
+        </div>
       </div>
       <nav>
         <ul>
@@ -28,7 +31,6 @@
 
   <div class="page-title">
     <h2>Dashboard</h2>
-    <p>Your daily health overview at a glance</p>
   </div>
 
   <div class="main">
@@ -49,29 +51,58 @@
 
     </div>
 
-    <!-- Goal Points Card -->
+    <!-- Rewards Card -->
     <div class="card">
-      <h3>Goal Points</h3>
+      <h3>Rewards</h3>
       <div class="metric">
-        <div id="fitpoints-value" class="metric-value">65 Points</div>
-        <p id="fitpoints-sub" class="metric-sub">Complete goals to earn more points!</p>
+        <div id="rewards-total" class="metric-value">0 Points</div>
+        <p id="rewards-subtitle" class="metric-sub">Complete goals to earn more points!</p>
       </div>
-      <div class="progress-container">
-        <p class="progress-title">Progress to Next Milestone</p>
-        <p id="current-goal-title" class="current-goal-title">Lose 5 lbs in 6 weeks</p>
-        <div class="progress-bar-wrapper">
-          <div id="progress-bar-fill" class="progress-bar-fill" style="width: 65%;">
-            <span id="goal-percentage" class="progress-fill-text">(65%)</span>
-          </div>
+      <div style="text-align: center;">
+        <button class="btn btn-secondary" onclick="resetPoints()" style="padding:0.5rem 1rem;font-size:0.9rem;background:#ef4444;color:#fff;">Reset Points</button>
+      </div>
+      <!-- Badges earned -->
+      <div class="badges-section" style="margin-top:1rem;">
+        <h4>Badges</h4>
+        <p id="badges-earned" class="goal-small">0 / 10 badges earned</p>
+        <div id="badges-container" class="badges-grid" aria-live="polite">
+          <!-- badges will be injected here -->
         </div>
-        <p id="goal-reward" class="goal-reward">Reward: +20 pts</p>
       </div>
     </div>
 
+    <!-- User Goals Container -->
+    <div class="card">
+      <div id="goal-completion-message" class="goal-completion-message" aria-live="polite" aria-atomic="true" style="display:none;"></div>
+      <div class="goals-header">
+        <h3>Your Goals</h3>
+        <button class="btn-new-goal" onclick="createNewGoal()">+ New Goal</button>
+      </div>
+
+      <div class="goals-section">
+        <h4>Current Goals</h4>
+        <div id="current-goals-list" class="goals-list">
+          <!-- Current goals will be displayed here -->
+        </div>
+        <p id="no-current-goals" class="no-goals-message">No current goals. Create one to get started!</p>
+      </div>
+
+      <div class="goals-section" style="margin-top:1rem;">
+        <h4>Completed Goals</h4>
+        <div id="completed-goals-list" class="goals-list">
+          <!-- Completed goals will be displayed here -->
+        </div>
+        <p id="no-completed-goals" class="no-goals-message">No completed goals yet.</p>
+      </div>
+
+      <div style="margin-top:1.5rem; text-align:center;">
+        <button class="btn btn-secondary" onclick="clearAllGoals()" style="background:#ef4444;color:#fff;">Clear All Goals</button>
+      </div>
+    </div>
 
   </div>
 
   <script src="js/data.js"></script>
-  <script src="js/progress.js"></script>
+  <script src="js/dashboard.js"></script>
 </body>
 </html>
