@@ -401,6 +401,23 @@
     text-align: center;
   }
   
+.progress-controls { margin-bottom: 1rem; }
+
+.progress-log { margin-top: 1.5rem; }
+
+.delete-btn {
+  padding: 0.4rem 0.8rem;
+  background: #3a3a3a;
+  color: #e0e0e0;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.delete-btn:hover {
+  background: #ef4444;
+  color: white;
+}
+
   /* Dashboard - Progress Container Title */
   .progress-title {
     color: #4ade80;
