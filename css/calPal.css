@@ -747,3 +747,104 @@
       width: 100%;
     }
   }
+  /* Exercise Tracker – layout helpers (no color changes) */
+
+.exercise-stats {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 1.5rem 1.5rem 0;
+  flex-wrap: wrap;
+}
+
+.exercise-stat-card {
+  min-width: 160px;
+  text-align: center;
+}
+
+.exercise-page-wrapper {
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1.5rem 3rem;
+}
+
+.exercise-main {
+  width: 100%;
+  max-width: 900px;
+}
+
+.card {
+  margin-bottom: 2rem;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.form-row {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.form-group {
+  flex: 1;
+  min-width: 180px;
+}
+
+.workout-type-toggle {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin: 1.2rem 0;
+}
+
+.workout-toggle-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+}
+
+.workout-section {
+  margin-top: 0.5rem;
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
+}
+
+.btn-group {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 1.5rem;
+}
+
+.table-wrapper {
+  margin-top: 1rem;
+  overflow-x: auto;
+}
+
+.exercise-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.exercise-table th,
+.exercise-table td {
+  padding: 0.7rem;
+  text-align: left;
+}
+
+@media (max-width: 768px) {
+  .exercise-page-wrapper {
+    padding: 1.5rem 1rem 2rem;
+  }
+
+  .exercise-stats {
+    padding-inline: 1rem;
+  }
+}
