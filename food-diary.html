@@ -35,10 +35,14 @@
   </div>
 
   <div class="main">
+    <!-- CARD 1: Add a meal -->
     <div class="card">
       <h3>Add a Meal</h3>
+
+      <!-- status / error messages -->
       <div id="message"></div>
 
+      <!-- Quick Add dropdown (presets) -->
       <div class="form-group">
         <label for="preset">Quick Add (Preset Foods)</label>
         <select id="preset">
@@ -46,6 +50,7 @@
         </select>
       </div>
 
+      <!-- Meal type + food name -->
       <div class="form-row">
         <div class="form-group">
           <label for="meal-type">Meal Type</label>
@@ -56,43 +61,94 @@
             <option value="Snack">Snack</option>
           </select>
         </div>
+
         <div class="form-group">
           <label for="food-name">Food Name</label>
-          <input type="text" id="food-name" placeholder="e.g., Chicken salad">
+          <input
+            type="text"
+            id="food-name"
+            placeholder="e.g., Chicken breast"
+            list="food-suggestions"
+          />
+
+          <!-- Autocomplete suggestions from presets -->
+          <datalist id="food-suggestions"></datalist>
+
+          <!-- USDA lookup button -->
+          <button type="button" id="lookup-btn" class="btn-secondary" style="margin-top: 0.5rem;">
+            Lookup Nutrition (USDA)
+          </button>
+
+          <small style="display:block; font-size:0.8rem; color:#666; margin-top:0.25rem;">
+            Auto-fills calories, protein, carbs &amp; fat using USDA FoodData Central.
+          </small>
         </div>
       </div>
 
+      <!-- Macros -->
       <div class="form-row">
         <div class="form-group">
           <label for="calories">Calories</label>
-          <input type="number" id="calories" placeholder="e.g., 350">
+          <input type="number" id="calories" placeholder="kcal">
         </div>
         <div class="form-group">
           <label for="protein">Protein (g)</label>
-          <input type="number" id="protein" placeholder="e.g., 30">
+          <input type="number" id="protein" placeholder="g">
         </div>
       </div>
 
       <div class="form-row">
         <div class="form-group">
           <label for="carbs">Carbs (g)</label>
-          <input type="number" id="carbs" placeholder="e.g., 40">
+          <input type="number" id="carbs" placeholder="g">
         </div>
         <div class="form-group">
           <label for="fat">Fat (g)</label>
-          <input type="number" id="fat" placeholder="e.g., 10">
+          <input type="number" id="fat" placeholder="g">
         </div>
       </div>
 
+      <!-- Servings scaling -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="servings">Servings</label>
+          <input type="number" id="servings" value="1" min="0.1" step="0.1">
+        </div>
+      </div>
+
+      <!-- Add / Clear buttons -->
       <div class="btn-group">
         <button id="add-btn">Add to Diary</button>
         <button id="clear-all-btn" class="btn-secondary">Clear All</button>
       </div>
+
+      <hr>
+
+      <!-- Preset management -->
+      <h4>Preset Foods</h4>
+      <p style="font-size:0.9rem;color:#666;">
+        Use USDA lookup or manually enter macros, then save as a preset.
+        You can also edit or delete your custom presets.
+      </p>
+
+      <div class="btn-group">
+        <button id="save-preset-btn" class="btn-secondary">
+          Save as New Preset + Add to Diary
+        </button>
+        <button id="update-preset-btn" class="btn-secondary">
+          Update Selected Preset
+        </button>
+        <button id="delete-preset-btn" class="btn-secondary">
+          Delete Selected Preset
+        </button>
+      </div>
     </div>
 
+    <!-- CARD 2: Today's meals -->
     <div class="card">
       <h3>Today's Meals</h3>
       <div id="totals" class="totals">No meals logged yet.</div>
+
       <table>
         <thead>
           <tr>
@@ -102,13 +158,10 @@
             <th>Protein (g)</th>
             <th>Carbs (g)</th>
             <th>Fat (g)</th>
+            <th>Actions</th>
           </tr>
         </thead>
-        <tbody id="meals-tbody">
-          <tr>
-            <td colspan="6" style="text-align: center; color: #a0a0a0;">No meals logged yet.</td>
-          </tr>
-        </tbody>
+        <tbody id="meals-tbody"></tbody>
       </table>
     </div>
   </div>
@@ -117,3 +170,6 @@
   <script src="js/foodDiary.js"></script>
 </body>
 </html>
+
+
+ml>
