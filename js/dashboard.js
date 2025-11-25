@@ -3,12 +3,302 @@
 // Initialize goals from localStorage or use empty array
 let userGoals = JSON.parse(localStorage.getItem('userGoals')) || [];
 
+// Daily goals list
+const DAILY_GOALS = [
+  'Go for a 20 minute walk',
+  'Cook a new healthy meal',
+  'Go to the gym',
+  'Drink 7-8 glasses of water',
+  'Read for 30 minutes',
+  'Meditate for 5 minutes',
+  'Practice self care',
+  'Go to sleep by 10 PM',
+  'Reduce unecessary screen time',
+  'Stretch for 10 minutes'
+];
+
+const DAILY_GOAL_REWARD = 20;
+
+// Get completed daily goals history from localStorage
+function getCompletedDailyGoals() {
+  const stored = localStorage.getItem('completedDailyGoals');
+  return stored ? JSON.parse(stored) : [];
+}
+
+// Save completed daily goals history to localStorage
+function saveCompletedDailyGoals(goals) {
+  localStorage.setItem('completedDailyGoals', JSON.stringify(goals));
+}
+
 // Initialize the dashboard on page load
 document.addEventListener('DOMContentLoaded', function() {
+  displayDailyGoal();
   displayGoals();
+  renderCompletedDailyGoals();
   updateGoalPoints();
   updateCaloriesOverview();
 });
+
+// ==================== DAILY GOAL FUNCTIONS ====================
+
+// Get or initialize daily goal data
+function getDailyGoalData() {
+  const stored = localStorage.getItem('dailyGoalData');
+  if (stored) {
+    return JSON.parse(stored);
+  }
+  return null;
+}
+
+// Save daily goal data
+function saveDailyGoalData(data) {
+  localStorage.setItem('dailyGoalData', JSON.stringify(data));
+}
+
+// Check if we need a new daily goal (new day or no goal set)
+function needsNewDailyGoal() {
+  const data = getDailyGoalData();
+  if (!data) return true;
+  
+  const today = new Date().toDateString();
+  return data.date !== today;
+}
+
+// Pick a random daily goal
+function pickRandomDailyGoal() {
+  const randomIndex = Math.floor(Math.random() * DAILY_GOALS.length);
+  return DAILY_GOALS[randomIndex];
+}
+
+// Get or create today's daily goal
+function getTodaysDailyGoal() {
+  if (needsNewDailyGoal()) {
+    const newGoal = {
+      date: new Date().toDateString(),
+      goal: pickRandomDailyGoal(),
+      completed: false,
+      progress: 0
+    };
+    saveDailyGoalData(newGoal);
+    return newGoal;
+  }
+  return getDailyGoalData();
+}
+
+// Refresh daily goal (manual refresh)
+function refreshDailyGoal() {
+  const newGoal = {
+    date: new Date().toDateString(),
+    goal: pickRandomDailyGoal(),
+    completed: false,
+    progress: 0
+  };
+  saveDailyGoalData(newGoal);
+  
+  displayDailyGoal();
+  updateGoalPoints();
+}
+
+// Display the daily goal
+function displayDailyGoal() {
+  const dailyGoalContainer = document.getElementById('daily-goal-container');
+  if (!dailyGoalContainer) return;
+  
+  const goalData = getTodaysDailyGoal();
+  
+  if (goalData.completed) {
+    // Show placeholder message when completed
+    dailyGoalContainer.innerHTML = `
+      <p class="no-goals-message">The daily goal for today has been completed. Great Job!</p>
+    `;
+  } else {
+    const progressPercent = goalData.progress;
+    const SHOW_FILL_LABEL_PERCENT = 20;
+    const showFillLabel = progressPercent >= SHOW_FILL_LABEL_PERCENT;
+    const progressText = `${progressPercent}%`;
+    
+    dailyGoalContainer.innerHTML = `
+      <div class="goal-item">
+        <div class="goal-item-title">${escapeHtml(goalData.goal)}</div>
+        <div class="goal-item-description">Today's daily goal - Complete it to earn ${DAILY_GOAL_REWARD} points!</div>
+        <div class="goal-meta">
+          <span class="goal-small"><strong>Type:</strong> Daily Goal</span>
+          <span class="goal-small"><strong>Reward:</strong> +${DAILY_GOAL_REWARD} pts</span>
+        </div>
+        <div class="goal-progress-wrapper" aria-hidden="false">
+          <div class="goal-progress-fill" style="width:${progressPercent}%">
+            <div class="goal-progress-fill-label" style="display:${showFillLabel ? 'flex' : 'none'}">${escapeHtml(progressText)}</div>
+          </div>
+          <div class="goal-progress-pill" style="display:${showFillLabel ? 'none' : 'block'}"></div>
+          <div class="goal-progress-overlay" style="display:${showFillLabel ? 'none' : 'flex'}">${escapeHtml(progressText)}</div>
+        </div>
+        <div class="goal-actions">
+          <button class="btn btn-secondary" onclick="editDailyGoalProgress()">Edit Progress</button>
+          <button class="btn btn-secondary" onclick="completeDailyGoal()">Mark Complete</button>
+        </div>
+      </div>
+    `;
+  }
+}
+
+// Edit daily goal progress
+function editDailyGoalProgress() {
+  const goalData = getDailyGoalData();
+  if (!goalData || goalData.completed) return;
+  
+  const val = prompt('Enter progress percentage (0-100):', String(goalData.progress || 0));
+  const p = parseFloat(val);
+  if (isNaN(p) || p < 0 || p > 100) return alert('Invalid percentage');
+  
+  goalData.progress = p;
+  if (p >= 100) {
+    goalData.progress = 100;
+    goalData.completed = true;
+    saveDailyGoalData(goalData);
+    showInlineDailyGoalCompletion();
+  } else {
+    saveDailyGoalData(goalData);
+    displayDailyGoal();
+  }
+}
+
+// Complete daily goal
+function completeDailyGoal() {
+  if (!confirm('Mark this daily goal as complete?')) return;
+  
+  const goalData = getDailyGoalData();
+  if (!goalData || goalData.completed) return;
+  
+  goalData.completed = true;
+  goalData.progress = 100;
+  saveDailyGoalData(goalData);
+  showInlineDailyGoalCompletion();
+}
+
+// Show inline completion for daily goal, then move to completed goals
+function showInlineDailyGoalCompletion() {
+  const goalData = getDailyGoalData();
+  if (!goalData) return;
+  
+  // Pick random completion message
+  const raw = COMPLETION_MESSAGES[Math.floor(Math.random() * COMPLETION_MESSAGES.length)];
+  const matchEmoji = raw.match(/^([\p{Emoji_Presentation}\p{Extended_Pictographic}])/u);
+  const emoji = matchEmoji ? matchEmoji[0] : raw.charAt(0);
+  const text = matchEmoji ? raw.slice(emoji.length).trim() : raw;
+
+  const dailyGoalContainer = document.getElementById('daily-goal-container');
+  if (!dailyGoalContainer) {
+    addDailyGoalToCompleted();
+    displayDailyGoal();
+    return;
+  }
+
+  // Show completion message
+  const placeholder = document.createElement('div');
+  placeholder.className = 'goal-inline-message';
+  placeholder.innerHTML = `<span class="emoji">${emoji}</span><span>${escapeHtml(text)}</span>`;
+  
+  dailyGoalContainer.innerHTML = '';
+  dailyGoalContainer.appendChild(placeholder);
+
+  // After delay, show placeholder message and move to completed
+  setTimeout(() => {
+    addDailyGoalToCompleted();
+    displayDailyGoal();
+  }, 3000);
+}
+
+// Add completed daily goal to history and render
+function addDailyGoalToCompleted() {
+  const goalData = getDailyGoalData();
+  if (!goalData || !goalData.completed) return;
+  
+  // Get completed history
+  const completedGoals = getCompletedDailyGoals();
+  
+  // Create a unique ID for this completion
+  const completionRecord = {
+    id: Date.now(),
+    goal: goalData.goal,
+    completedDate: new Date().toLocaleDateString(),
+    timestamp: Date.now()
+  };
+  
+  // Add to history
+  completedGoals.push(completionRecord);
+  saveCompletedDailyGoals(completedGoals);
+  
+  // Re-render the completed daily goals
+  renderCompletedDailyGoals();
+  
+  // Update points
+  updateGoalPoints();
+}
+
+// Render all completed daily goals from localStorage
+function renderCompletedDailyGoals() {
+  const completedList = document.getElementById('completed-goals-list');
+  const noCompleted = document.getElementById('no-completed-goals');
+  if (!completedList) return;
+  
+  // Get completed daily goals from storage
+  const completedGoals = getCompletedDailyGoals();
+  
+  // Remove existing daily goal elements
+  const existingDailyGoals = completedList.querySelectorAll('.daily-goal-completed');
+  existingDailyGoals.forEach(el => el.remove());
+  
+  // Add each completed daily goal
+  completedGoals.forEach((goalRecord, index) => {
+    const item = document.createElement('div');
+    item.className = 'goal-item daily-goal-completed';
+    item.dataset.id = goalRecord.id;
+    item.innerHTML = `
+      <div class="goal-item-title">${escapeHtml(goalRecord.goal)} <span style="color:#4ade80;font-weight:600;margin-left:8px;">(Completed)</span></div>
+      <div class="goal-item-description">Daily goal completed!</div>
+      <div class="goal-meta">
+        <span class="goal-small"><strong>Type:</strong> Daily Goal</span>
+        <span class="goal-small"><strong>Completed:</strong> ${goalRecord.completedDate}</span>
+        <span class="goal-small"><strong>Reward:</strong> +${DAILY_GOAL_REWARD} pts</span>
+      </div>
+      <div class="goal-actions">
+        <button class="btn btn-secondary" style="background:#ef4444;color:#fff;" onclick="deleteDailyGoal(this)">Delete</button>
+      </div>
+    `;
+    
+    // Add to top of completed list
+    completedList.insertBefore(item, completedList.firstChild);
+  });
+  
+  // Update "no completed goals" visibility
+  if (noCompleted) {
+    const hasAnyCompleted = completedList.querySelector('.goal-item') !== null;
+    noCompleted.style.display = hasAnyCompleted ? 'none' : 'block';
+  }
+}
+
+// Delete a completed daily goal
+function deleteDailyGoal(button) {
+  if (!confirm(`Delete this completed daily goal? The ${DAILY_GOAL_REWARD} reward points will be refunded.`)) return;
+  
+  const goalItem = button.closest('.goal-item');
+  if (!goalItem) return;
+  
+  const goalId = parseInt(goalItem.dataset.id);
+  
+  // Remove from localStorage
+  const completedGoals = getCompletedDailyGoals();
+  const filteredGoals = completedGoals.filter(g => g.id !== goalId);
+  saveCompletedDailyGoals(filteredGoals);
+  
+  // Re-render
+  renderCompletedDailyGoals();
+  
+  // Update points after deletion
+  updateGoalPoints();
+}
+
+// ==================== USER GOALS FUNCTIONS ====================
 
 // Display current and completed goals
 function displayGoals() {
@@ -18,11 +308,16 @@ function displayGoals() {
   const noCompleted = document.getElementById('no-completed-goals');
 
   currentList.innerHTML = '';
-  completedList.innerHTML = '';
+  
+  // Clear only user goals, not daily goals
+  const userGoalElements = completedList.querySelectorAll('.goal-item:not(.daily-goal-completed)');
+  userGoalElements.forEach(el => el.remove());
 
   if (!userGoals || userGoals.length === 0) {
     noCurrent.style.display = 'block';
-    noCompleted.style.display = 'block';
+    // Only show "no completed" if there's also no daily goals
+    const hasCompletedDaily = getCompletedDailyGoals().length > 0;
+    noCompleted.style.display = hasCompletedDaily ? 'none' : 'block';
     return;
   }
 
@@ -42,7 +337,9 @@ function displayGoals() {
   });
 
   noCurrent.style.display = hasCurrent ? 'none' : 'block';
-  noCompleted.style.display = hasCompleted ? 'none' : 'block';
+  // Check if we have completed goals OR completed daily goals
+  const hasCompletedDaily = getCompletedDailyGoals().length > 0;
+  noCompleted.style.display = (hasCompleted || hasCompletedDaily) ? 'none' : 'block';
   updateGoalPoints();
 }
 
@@ -156,10 +453,20 @@ function completeGoal(index) {
 
 // Delete a goal
 function deleteGoal(index) {
-  if (!confirm('Delete this goal?')) return;
+  const goal = userGoals[index];
+  if (!goal) return;
+  
+  let confirmMsg = 'Delete this goal?';
+  if (goal.status === 'Completed' && goal.reward) {
+    confirmMsg = `Delete this goal? The ${goal.reward} reward points will be refunded.`;
+  }
+  
+  if (!confirm(confirmMsg)) return;
+  
   userGoals.splice(index, 1);
   localStorage.setItem('userGoals', JSON.stringify(userGoals));
   displayGoals();
+  updateGoalPoints();
 }
 
 // Log progress for Exercise or Weight Loss goals
@@ -263,11 +570,35 @@ function formatDate(d) {
 
 // Clear all goals
 function clearAllGoals() {
-  if (!confirm('Are you sure you want to delete ALL goals? This cannot be undone.')) return;
+  // Calculate total points that will be lost
+  const userGoalsReward = userGoals
+    .filter(goal => goal.status === 'Completed')
+    .reduce((sum, goal) => sum + (Number(goal.reward) || 0), 0);
+  
+  const dailyGoalsCount = getCompletedDailyGoals().length;
+  const dailyGoalReward = dailyGoalsCount * DAILY_GOAL_REWARD;
+  const totalPointsLost = userGoalsReward + dailyGoalReward;
+  
+  const confirmMsg = totalPointsLost > 0
+    ? `Are you sure you want to delete ALL goals? This cannot be undone.\n\nYou will lose ${totalPointsLost} reward points.`
+    : 'Are you sure you want to delete ALL goals? This cannot be undone.';
+  
+  if (!confirm(confirmMsg)) return;
+  
   userGoals = [];
   localStorage.setItem('userGoals', JSON.stringify(userGoals));
+  localStorage.removeItem('dailyGoalData');
+  saveCompletedDailyGoals([]);
+  
+  displayDailyGoal();
   displayGoals();
-  alert('All goals have been cleared.');
+  renderCompletedDailyGoals();
+  updateGoalPoints();
+  
+  const message = totalPointsLost > 0
+    ? `All goals have been cleared. ${totalPointsLost} points have been refunded.`
+    : 'All goals have been cleared.';
+  alert(message);
 }
 
 // Simple HTML escape
@@ -278,9 +609,15 @@ function escapeHtml(str) {
 
 // Update Goal Points display with total earned rewards
 function updateGoalPoints() {
-  const totalReward = userGoals
+  // Calculate points from user goals
+  const userGoalsReward = userGoals
     .filter(goal => goal.status === 'Completed')
     .reduce((sum, goal) => sum + (Number(goal.reward) || 0), 0);
+  
+  // Count all completed daily goals from localStorage
+  const dailyGoalsCount = getCompletedDailyGoals().length;
+  const dailyGoalReward = dailyGoalsCount * DAILY_GOAL_REWARD;
+  const totalReward = userGoalsReward + dailyGoalReward;
 
   const rewardsElement = document.getElementById('rewards-total');
   if (rewardsElement) {
@@ -297,6 +634,10 @@ function renderBadges(totalReward) {
   const container = document.getElementById('badges-container');
   const earnedLabel = document.getElementById('badges-earned');
   if (!container) return;
+
+  // Get previously unlocked count from localStorage
+  const previousUnlockedStr = localStorage.getItem('previousBadgeCount');
+  const previousUnlocked = previousUnlockedStr ? parseInt(previousUnlockedStr) : null;
 
   container.innerHTML = '';
   let unlocked = 0;
@@ -322,21 +663,41 @@ function renderBadges(totalReward) {
   if (earnedLabel) {
     earnedLabel.textContent = `${unlocked} / ${thresholds.length} badges earned`;
   }
+
+  // Check if new badge was earned (only if we have a previous count)
+  if (previousUnlocked !== null && unlocked > previousUnlocked) {
+    const badgesEarned = unlocked - previousUnlocked;
+    showBadgeEarnedMessage(badgesEarned, unlocked);
+  }
+  
+  // Always update stored count
+  localStorage.setItem('previousBadgeCount', unlocked.toString());
+}
+
+// Show congratulations message for earning a badge
+function showBadgeEarnedMessage(count, totalBadges) {
+  const messageDiv = document.getElementById('goal-completion-message');
+  if (!messageDiv) return;
+
+  const message = count === 1 
+    ? `🎉 Congratulations! You earned a new badge! (${totalBadges} total)`
+    : `🎉 Congratulations! You earned ${count} new badges! (${totalBadges} total)`;
+
+  messageDiv.textContent = message;
+  messageDiv.classList.remove('fade-out');
+  messageDiv.style.display = 'block';
+
+  // Auto hide after 5 seconds
+  setTimeout(() => {
+    messageDiv.classList.add('fade-out');
+    setTimeout(() => {
+      messageDiv.style.display = 'none';
+      messageDiv.classList.remove('fade-out');
+    }, 500);
+  }, 5000);
 }
 
 // Reset points by clearing all rewards
-function resetPoints() {
-  if (!confirm('Are you sure you want to reset all points? This will clear all goal rewards.')) return;
-  userGoals.forEach(goal => {
-    if (goal.status === 'Completed') {
-      goal.reward = 0;
-    }
-  });
-  localStorage.setItem('userGoals', JSON.stringify(userGoals));
-  updateGoalPoints();
-  alert('Points have been reset to 0.');
-}
-
 // Completion encouragement messages
 const COMPLETION_MESSAGES = [
   '👍 Good Job!',
@@ -347,30 +708,43 @@ const COMPLETION_MESSAGES = [
   '😊 Amazing work! You are accomplishing great things!'
 ];
 
-let completionMessageTimeout = null;
+// ==================== COMPLETION MESSAGE FUNCTIONS ====================
 
-function showCompletionMessage() {
-  const el = document.getElementById('goal-completion-message');
-  if (!el) return;
-  // pick random message
-  const msg = COMPLETION_MESSAGES[Math.floor(Math.random() * COMPLETION_MESSAGES.length)];
-  // clear previous timeout
-  if (completionMessageTimeout) {
-    clearTimeout(completionMessageTimeout);
-    completionMessageTimeout = null;
+// Show inline completion message at the position of the completed goal (temporary)
+function showInlineCompletionMessage(index) {
+  // pick random message and split emoji from text
+  const raw = COMPLETION_MESSAGES[Math.floor(Math.random() * COMPLETION_MESSAGES.length)];
+  // Extract leading emoji if present (first char might be surrogate pair)
+  const matchEmoji = raw.match(/^([\p{Emoji_Presentation}\p{Extended_Pictographic}])/u);
+  const emoji = matchEmoji ? matchEmoji[0] : raw.charAt(0);
+  const text = matchEmoji ? raw.slice(emoji.length).trim() : raw;
+
+  const currentContainer = document.getElementById('current-goals-list');
+  if (!currentContainer) {
+    displayGoals();
+    return;
   }
-  el.textContent = msg;
-  el.classList.remove('fade-out');
-  el.style.display = 'block';
-  // auto hide after 5 seconds
-  completionMessageTimeout = setTimeout(() => {
-    el.classList.add('fade-out');
-    setTimeout(() => {
-      el.style.display = 'none';
-      el.classList.remove('fade-out');
-    }, 500);
-  }, 5000);
+  const originalEl = currentContainer.querySelector(`.goal-item[data-goal-index="${index}"]`);
+  if (!originalEl) {
+    displayGoals();
+    return;
+  }
+
+  // Create placeholder message element
+  const placeholder = document.createElement('div');
+  placeholder.className = 'goal-inline-message';
+  placeholder.innerHTML = `<span class="emoji">${emoji}</span><span>${escapeHtml(text)}</span>`;
+
+  // Replace original goal element contents with message
+  originalEl.replaceWith(placeholder);
+
+  // After delay, re-render goals so the completed goal moves to completed list
+  setTimeout(() => {
+    displayGoals();
+  }, 3000);
 }
+
+// ==================== CALORIE OVERVIEW ====================
 
 // Update Calories Overview on dashboard
 function updateCaloriesOverview() {
@@ -420,40 +794,4 @@ function updateCaloriesOverview() {
       }
     }
   }
-}
-
-// Show inline completion message at the position of the completed goal (temporary)
-function showInlineCompletionMessage(index) {
-  // pick random message and split emoji from text
-  const raw = COMPLETION_MESSAGES[Math.floor(Math.random() * COMPLETION_MESSAGES.length)];
-  // Extract leading emoji if present (first char might be surrogate pair)
-  const matchEmoji = raw.match(/^([\p{Emoji_Presentation}\p{Extended_Pictographic}])/u);
-  const emoji = matchEmoji ? matchEmoji[0] : raw.charAt(0);
-  const text = matchEmoji ? raw.slice(emoji.length).trim() : raw;
-
-  const currentContainer = document.getElementById('current-goals-list');
-  if (!currentContainer) {
-    displayGoals();
-    return;
-  }
-  const originalEl = currentContainer.querySelector(`.goal-item[data-goal-index="${index}"]`);
-  if (!originalEl) {
-    // fallback: just re-render and show top message
-    showCompletionMessage();
-    displayGoals();
-    return;
-  }
-
-  // Create placeholder message element
-  const placeholder = document.createElement('div');
-  placeholder.className = 'goal-inline-message';
-  placeholder.innerHTML = `<span class="emoji">${emoji}</span><span>${escapeHtml(text)}</span>`;
-
-  // Replace original goal element contents with message
-  originalEl.replaceWith(placeholder);
-
-  // After delay, re-render goals so the completed goal moves to completed list
-  setTimeout(() => {
-    displayGoals();
-  }, 3000);
 }

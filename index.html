@@ -58,9 +58,6 @@
         <div id="rewards-total" class="metric-value">0 Points</div>
         <p id="rewards-subtitle" class="metric-sub">Complete goals to earn more points!</p>
       </div>
-      <div style="text-align: center;">
-        <button class="btn btn-secondary" onclick="resetPoints()" style="padding:0.5rem 1rem;font-size:0.9rem;background:#ef4444;color:#fff;">Reset Points</button>
-      </div>
       <!-- Badges earned -->
       <div class="badges-section" style="margin-top:1rem;">
         <h4>Badges</h4>
@@ -79,7 +76,18 @@
         <button class="btn-new-goal" onclick="createNewGoal()">+ New Goal</button>
       </div>
 
+      <!-- Daily Goal Section -->
       <div class="goals-section">
+        <h4>Daily Goal</h4>
+        <div id="daily-goal-container" class="goals-list">
+          <!-- Daily goal will be displayed here -->
+        </div>
+        <div style="text-align: center; margin-top: 1rem;">
+          <button class="btn" onclick="refreshDailyGoal()">Refresh Daily Goal</button>
+        </div>
+      </div>
+
+      <div class="goals-section" style="margin-top:1.5rem;">
         <h4>Current Goals</h4>
         <div id="current-goals-list" class="goals-list">
           <!-- Current goals will be displayed here -->
