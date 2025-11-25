@@ -44,6 +44,17 @@ document.addEventListener("DOMContentLoaded", () => {
   // ----- TOTALS STATE -----
   let totals = { calories: 0, protein: 0, carbs: 0, fat: 0 };
 
+  // ----- MEALS STATE -----
+  // Load meals from localStorage or use empty array
+  let meals = JSON.parse(localStorage.getItem('dailyMeals')) || [];
+
+  // =========================
+  // HELPERS: MEALS STORAGE
+  // =========================
+  function saveMeals() {
+    localStorage.setItem('dailyMeals', JSON.stringify(meals));
+  }
+
   // =========================
   // HELPERS: PRESETS STORAGE
   // =========================
@@ -196,21 +207,31 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!btn) return;
 
     btn.addEventListener("click", () => {
-      const c = Number(row.dataset.calories) || 0;
-      const p = Number(row.dataset.protein)  || 0;
-      const cb = Number(row.dataset.carbs)   || 0;
-      const f = Number(row.dataset.fat)      || 0;
+      const index = parseInt(row.dataset.index);
+      
+      // Remove from meals array
+      if (!isNaN(index) && index >= 0 && index < meals.length) {
+        const meal = meals[index];
+        
+        // Subtract from totals
+        totals.calories = Math.max(0, totals.calories - (Number(meal.calories) || 0));
+        totals.protein  = Math.max(0, totals.protein  - (Number(meal.protein) || 0));
+        totals.carbs    = Math.max(0, totals.carbs    - (Number(meal.carbs) || 0));
+        totals.fat      = Math.max(0, totals.fat      - (Number(meal.fat) || 0));
 
-      totals.calories = Math.max(0, totals.calories - c);
-      totals.protein  = Math.max(0, totals.protein  - p);
-      totals.carbs    = Math.max(0, totals.carbs    - cb);
-      totals.fat      = Math.max(0, totals.fat      - f);
+        // Remove meal from array
+        meals.splice(index, 1);
+        saveMeals();
+      }
 
       row.remove();
 
       if (mealsTbody.children.length === 0) {
         addPlaceholderRow();
       }
+      
+      // Re-render to fix indices
+      renderMealsTable();
       updateTotals();
       showMessage("Meal removed.", "info");
     });
@@ -236,39 +257,28 @@ document.addEventListener("DOMContentLoaded", () => {
     const scaledCarbs    = +(carbs * servings).toFixed(1);
     const scaledFat      = +(fat * servings).toFixed(1);
 
-    if (
-      mealsTbody.children.length === 0 ||
-      mealsTbody.children[0].dataset.placeholder === "true"
-    ) {
-      mealsTbody.innerHTML = "";
-    }
-
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td>${mealTypeSelect.value}</td>
-      <td>${name} (${servings}x)</td>
-      <td>${scaledCalories}</td>
-      <td>${scaledProtein}</td>
-      <td>${scaledCarbs}</td>
-      <td>${scaledFat}</td>
-      <td><button type="button" class="delete-row-btn btn-secondary">Delete</button></td>
-    `;
-
-    // Store macros on the row for easy subtraction later
-    row.dataset.calories = scaledCalories;
-    row.dataset.protein  = scaledProtein;
-    row.dataset.carbs    = scaledCarbs;
-    row.dataset.fat      = scaledFat;
-
-    mealsTbody.appendChild(row);
-    attachDeleteHandler(row);
+    // Add meal to array
+    const meal = {
+      mealType: mealTypeSelect.value,
+      name: name,
+      servings: servings,
+      calories: scaledCalories,
+      protein: scaledProtein,
+      carbs: scaledCarbs,
+      fat: scaledFat
+    };
+    
+    meals.push(meal);
+    saveMeals();
 
     totals.calories += scaledCalories;
     totals.protein  += scaledProtein;
     totals.carbs    += scaledCarbs;
     totals.fat      += scaledFat;
 
+    renderMealsTable();
     updateTotals();
+    
     if (showMessages) {
       showMessage("Meal added!", "success");
     }
@@ -288,6 +298,33 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
   }
 
+  function renderMealsTable() {
+    if (meals.length === 0) {
+      addPlaceholderRow();
+      return;
+    }
+
+    mealsTbody.innerHTML = "";
+
+    meals.forEach((meal, index) => {
+      const row = document.createElement("tr");
+      row.dataset.index = index;
+      
+      row.innerHTML = `
+        <td>${meal.mealType}</td>
+        <td>${meal.name} (${meal.servings}x)</td>
+        <td>${meal.calories}</td>
+        <td>${meal.protein}</td>
+        <td>${meal.carbs}</td>
+        <td>${meal.fat}</td>
+        <td><button type="button" class="delete-row-btn btn-secondary">Delete</button></td>
+      `;
+
+      mealsTbody.appendChild(row);
+      attachDeleteHandler(row);
+    });
+  }
+
   function updateTotals() {
     const t = totals;
     if (t.calories === 0) {
@@ -299,6 +336,16 @@ document.addEventListener("DOMContentLoaded", () => {
       `P: ${t.protein.toFixed(1)} g | ` +
       `C: ${t.carbs.toFixed(1)} g | ` +
       `F: ${t.fat.toFixed(1)} g`;
+  }
+
+  function recalculateTotals() {
+    totals = { calories: 0, protein: 0, carbs: 0, fat: 0 };
+    meals.forEach(meal => {
+      totals.calories += Number(meal.calories) || 0;
+      totals.protein  += Number(meal.protein) || 0;
+      totals.carbs    += Number(meal.carbs) || 0;
+      totals.fat      += Number(meal.fat) || 0;
+    });
   }
 
   // =========================
@@ -347,7 +394,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Clear diary
   clearAllBtn.addEventListener("click", () => {
+    meals = [];
     totals = { calories: 0, protein: 0, carbs: 0, fat: 0 };
+    saveMeals();
     addPlaceholderRow();
     updateTotals();
     showMessage("Diary cleared.", "success");
@@ -460,7 +509,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // =========================
   // INITIALIZATION
   // =========================
-  addPlaceholderRow();
+  recalculateTotals();
+  renderMealsTable();
   refreshPresetSelect();
   updateTotals();
 });
