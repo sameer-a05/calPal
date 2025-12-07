@@ -3,7 +3,6 @@
 
 document.addEventListener("DOMContentLoaded", () => {
   // ====== YOUR USDA API KEY ======
-  // Replace this with your real key:
   const USDA_API_KEY = "VBnemukw6NKi7945s5cRUu3su6swzguub4XMZ6tc";
 
   // USDA nutrient IDs
@@ -11,6 +10,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const NUTRIENT_PROTEIN = "203";
   const NUTRIENT_CARBS   = "205";
   const NUTRIENT_FAT     = "204";
+
+  // Meal type icons
+  const MEAL_TYPE_ICONS = {
+    Breakfast: "🍳",
+    Lunch: "🥪",
+    Dinner: "🍲",
+    Snack: "🍎",
+    Other: "🍽️"
+  };
 
   // ----- DOM ELEMENTS -----
   const presetSelect      = document.getElementById("preset");
@@ -45,7 +53,6 @@ document.addEventListener("DOMContentLoaded", () => {
   let totals = { calories: 0, protein: 0, carbs: 0, fat: 0 };
 
   // ----- MEALS STATE -----
-  // Load meals from localStorage or use empty array
   let meals = JSON.parse(localStorage.getItem('dailyMeals')) || [];
 
   // =========================
@@ -165,7 +172,6 @@ document.addEventListener("DOMContentLoaded", () => {
       if (carbs != null) carbsInput.value    = carbs.toFixed(1);
       if (fat   != null) fatInput.value      = fat.toFixed(1);
 
-      // Reset servings to 1 whenever new macros are loaded
       servingsInput.value = "1";
 
       if (!foodNameInput.value.trim() && food.description) {
@@ -180,7 +186,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // =========================
-  // APPLY PRESET BY NAME (for autocomplete)
+  // APPLY PRESET BY NAME
   // =========================
   function applyPresetByName(name) {
     if (!name) return false;
@@ -209,17 +215,14 @@ document.addEventListener("DOMContentLoaded", () => {
     btn.addEventListener("click", () => {
       const index = parseInt(row.dataset.index);
       
-      // Remove from meals array
       if (!isNaN(index) && index >= 0 && index < meals.length) {
         const meal = meals[index];
         
-        // Subtract from totals
         totals.calories = Math.max(0, totals.calories - (Number(meal.calories) || 0));
         totals.protein  = Math.max(0, totals.protein  - (Number(meal.protein) || 0));
         totals.carbs    = Math.max(0, totals.carbs    - (Number(meal.carbs) || 0));
         totals.fat      = Math.max(0, totals.fat      - (Number(meal.fat) || 0));
 
-        // Remove meal from array
         meals.splice(index, 1);
         saveMeals();
       }
@@ -230,7 +233,6 @@ document.addEventListener("DOMContentLoaded", () => {
         addPlaceholderRow();
       }
       
-      // Re-render to fix indices
       renderMealsTable();
       updateTotals();
       showMessage("Meal removed.", "info");
@@ -246,9 +248,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const servings = parseFloat(servingsInput.value) || 1;
 
     if (!name || calories <= 0 || servings <= 0) {
-      if (showMessages) {
-        showMessage("Enter food name, calories, and servings > 0.", "error");
-      }
+      if (showMessages) showMessage("Enter food name, calories, and servings > 0.", "error");
       return false;
     }
 
@@ -257,11 +257,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const scaledCarbs    = +(carbs * servings).toFixed(1);
     const scaledFat      = +(fat * servings).toFixed(1);
 
-    // Add meal to array
     const meal = {
       mealType: mealTypeSelect.value,
-      name: name,
-      servings: servings,
+      name,
+      servings,
       calories: scaledCalories,
       protein: scaledProtein,
       carbs: scaledCarbs,
@@ -279,9 +278,7 @@ document.addEventListener("DOMContentLoaded", () => {
     renderMealsTable();
     updateTotals();
     
-    if (showMessages) {
-      showMessage("Meal added!", "success");
-    }
+    if (showMessages) showMessage("Meal added!", "success");
     return true;
   }
 
@@ -311,7 +308,7 @@ document.addEventListener("DOMContentLoaded", () => {
       row.dataset.index = index;
       
       row.innerHTML = `
-        <td>${meal.mealType}</td>
+        <td>${MEAL_TYPE_ICONS[meal.mealType] || ""} ${meal.mealType}</td>
         <td>${meal.name} (${meal.servings}x)</td>
         <td>${meal.calories}</td>
         <td>${meal.protein}</td>
@@ -349,10 +346,22 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // =========================
+  // POPULATE MEAL TYPE DROPDOWN
+  // =========================
+  function populateMealTypeDropdown() {
+    const types = Object.keys(MEAL_TYPE_ICONS);
+    mealTypeSelect.innerHTML = "";
+    types.forEach(type => {
+      const opt = document.createElement("option");
+      opt.value = type;
+      opt.textContent = `${MEAL_TYPE_ICONS[type]} ${type}`;
+      mealTypeSelect.appendChild(opt);
+    });
+  }
+
+  // =========================
   // EVENT HANDLERS
   // =========================
-
-  // Quick Add preset select
   presetSelect.addEventListener("change", () => {
     const index = presetSelect.value;
     if (index === "") return;
@@ -370,12 +379,10 @@ document.addEventListener("DOMContentLoaded", () => {
     showMessage("Preset loaded.", "info");
   });
 
-  // Autocomplete: when food name changes, try to match preset
   foodNameInput.addEventListener("change", () => {
     applyPresetByName(foodNameInput.value.trim());
   });
 
-  // USDA lookup
   lookupBtn.addEventListener("click", () => {
     lookupNutrition(foodNameInput.value);
   });
@@ -387,12 +394,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Add to diary using current data
   addBtn.addEventListener("click", () => {
     addCurrentMealToDiary(true);
   });
 
-  // Clear diary
   clearAllBtn.addEventListener("click", () => {
     meals = [];
     totals = { calories: 0, protein: 0, carbs: 0, fat: 0 };
@@ -402,7 +407,6 @@ document.addEventListener("DOMContentLoaded", () => {
     showMessage("Diary cleared.", "success");
   });
 
-  // Save as NEW preset and also add to diary
   savePresetBtn.addEventListener("click", () => {
     const name     = foodNameInput.value.trim();
     const calories = Number(caloriesInput.value);
@@ -433,7 +437,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Update selected preset
   updatePresetBtn.addEventListener("click", () => {
     const selectedIndex = presetSelect.value;
     if (selectedIndex === "") {
@@ -457,13 +460,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const customList = loadCustomPresets();
 
     if (idx < BASE_PRESETS.length) {
-      // Base preset: can't directly modify, so create a custom copy
       customList.push({ name, calories, protein, carbs, fat });
       saveCustomPresets(customList);
       refreshPresetSelect();
       showMessage("Base preset can't be edited, but a custom copy was saved.", "success");
     } else {
-      // Custom preset: update in place
       const customIndex = idx - BASE_PRESETS.length;
       if (customIndex < 0 || customIndex >= customList.length) {
         showMessage("Could not locate custom preset to update.", "error");
@@ -476,7 +477,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Delete selected preset
   deletePresetBtn.addEventListener("click", () => {
     const selectedIndex = presetSelect.value;
     if (selectedIndex === "") {
@@ -513,4 +513,5 @@ document.addEventListener("DOMContentLoaded", () => {
   renderMealsTable();
   refreshPresetSelect();
   updateTotals();
+  populateMealTypeDropdown();
 });
